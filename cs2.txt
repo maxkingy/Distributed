@@ -1,0 +1,53 @@
+id:IDS60903
+name:Adelaide (West Terrace / ngayirdapira)
+state: SA
+time_zone: CST
+lat: -34.9
+lon: 138.6
+local_date_time: 17/06:00pm
+local_date_time_full: 20230717180000
+air_temp: 22
+apparent_t: 20
+cloud: Clear
+dewpt: 6.1
+press: 1021.7
+rel_hum: 58
+wind_dir: NE
+wind_spd_kmh: 18
+wind_spd_kt: 10
+
+id:IDS60904
+name:Adelaide (West Terrace / ngayirdapira)
+state: SA
+time_zone: CST
+lat: -34.9
+lon: 138.6
+local_date_time: 18/07:00am
+local_date_time_full: 20230718070000
+air_temp: 10
+apparent_t: 7
+cloud: Overcast
+dewpt: 4.8
+press: 1025.3
+rel_hum: 65
+wind_dir: SW
+wind_spd_kmh: 20
+wind_spd_kt: 12
+
+id:IDS60905
+name:Adelaide (West Terrace / ngayirdapira)
+state: SA
+time_zone: CST
+lat: -34.9
+lon: 138.6
+local_date_time: 19/09:00am
+local_date_time_full: 20230719090000
+air_temp: 16.5
+apparent_t: 14
+cloud: Mostly sunny
+dewpt: 6.3
+press: 1019.5
+rel_hum: 55
+wind_dir: SE
+wind_spd_kmh: 12
+wind_spd_kt: 6
