@@ -27,13 +27,10 @@ class AggregationServerTest {
     aggregationServer.socket = mockSocket;
   }
 
-  @AfterEach
-  void tearDown() {
-    aggregationServer.stopServer();
-  }
-
   @Test
-  void startServerTest() {
-
+  @DisplayName("Start server test with default port")
+  void startServerTest_defaultPort() {
+    when(mockServerSocket.accept()).thenReturn(mockSocket);
+    St
   }
 }
