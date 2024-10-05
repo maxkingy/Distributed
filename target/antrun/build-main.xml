@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <delete>
+    <fileset dir="/home/maxking/git/Distributed">
+      <include name="LAMPORT_CLOCK.txt"/>
+      <include name="PID_COUNTER.txt"/>
+      <include name="PUT_HISTORY.txt"/>
+      <include name="weather.json"/>
+    </fileset>
+  </delete>
+</target>
+</project>

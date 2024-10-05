@@ -12,25 +12,15 @@ import org.junit.jupiter.api.Test;
 
 class AggregationServerTest {
 
-  private AggregationServer aggregationServer;
-  private ServerSocket mockServerSocket;
-  private Socket mockSocket;
-  private BufferedReader mockIn;
+	private AggregationServer server;
+	private ServerSocket mockServerSocket;
+	private Socket mockSocket;
+	private BufferedReader mockIn;
 
-  @BeforeEach
-  void setUp() throws Exception {
-    aggregationServer = new AggregationServer();
-    mockServerSocket = mock(ServerSocket.class);
-    mockSocket = mock(Socket.class);
-    mockIn = mock(BufferedReader.class);
-    aggregationServer.serverSocket = mockServerSocket;
-    aggregationServer.socket = mockSocket;
-  }
+	@BeforeEach
+	void setUp() throws Exception {
+		server = new AggregationServer();
+		
+	}
 
-  @Test
-  @DisplayName("Start server test with default port")
-  void startServerTest_defaultPort() {
-    when(mockServerSocket.accept()).thenReturn(mockSocket);
-    St
-  }
 }
