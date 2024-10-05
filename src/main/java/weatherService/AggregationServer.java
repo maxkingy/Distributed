@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,9 +19,6 @@ public class AggregationServer extends Thread {
 	// Initialise sockets
 	ServerSocket serverSocket;
 	Socket socket;
-
-	// Boolean variable for running
-	boolean running = false;
 
 	// Default port
 	int port = 4567;
@@ -59,7 +58,7 @@ public class AggregationServer extends Thread {
 				}
 				serverSocket = new ServerSocket(port);
 				System.out.println("Aggregation server starting up, listening at port " + port);
-				System.out.println("You can access http://localhost:4567 now.");
+				System.out.println("You can access http://localhost:" + port + " now.");
 			}
 			this.start();
 		} catch (Exception e) {
@@ -68,15 +67,25 @@ public class AggregationServer extends Thread {
 	}
 
 	/*
-	 * Method to stop the server. Set running to false, delete lamport clock files,
-	 * clear database and interrupt the thread, which stops run().
+	 * Method to stop the server. Interrupt the thread and close and set the server socket to null.
 	 */
 	public void stopServer() {
-		running = false;
-		clock.deleteFiles();
-		Database.getInstance().clearDatabase();
-		System.out.println("The aggregation server has been shutdown.");
-		this.interrupt();
+		try {
+			this.interrupt();
+			if (serverSocket != null && !serverSocket.isClosed()) {
+				serverSocket.close();
+			}
+			serverSocket = null;
+			if (clock != null) {
+				clock.deleteFiles();
+			}
+			Database.getInstance().clearDatabase();
+			System.out.println("The aggregation server has been shutdown.");
+		} catch (SocketException e) {
+			System.err.println("Error closing server socket: " + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("Error during server shutdown: " + e.getMessage());
+		}
 	}
 
 	/*
@@ -95,8 +104,7 @@ public class AggregationServer extends Thread {
 	 */
 	@Override
 	public void run() {
-		running = true;
-		while (running) {
+		while (!isInterrupted()) {
 			try {
 				socket = serverSocket.accept();
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -161,7 +169,11 @@ public class AggregationServer extends Thread {
 				}
 				in.close();
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				if (isInterrupted()) {
+					break;
+				} else {
+					throw new RuntimeException(e);
+				}
 			}
 		}
 	}

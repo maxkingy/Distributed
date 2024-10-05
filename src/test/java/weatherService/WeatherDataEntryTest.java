@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+/*
+ * Class is very simple, only contains getters and setters.
+ */
 class WeatherDataEntryTest {
 
 	@Test
