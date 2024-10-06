@@ -62,10 +62,22 @@ public class QueueHandler {
 	public ClientRequest getRequestFromQueue() {
 		ClientRequest req;
 		try {
-			req = queue.take();
+			req = queue.poll();
+			if (req == null) {
+				throw new RuntimeException("Queue is empty");
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		return req;
+	}
+
+	/*
+	 * Method to clear the queue.
+	 */
+	public void clearQueue() {
+		if (queue != null) {
+			queue.clear();
+		}
 	}
 }

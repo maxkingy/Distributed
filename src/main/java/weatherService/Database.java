@@ -314,7 +314,6 @@ public class Database {
 			for (TimerTask task : connectedContentServers.values()) {
 				task.cancel();
 			}
-			this.timer.cancel();
 			connectedContentServers.clear();
 		}
 		if (!database.isEmpty()) {
@@ -326,5 +325,6 @@ public class Database {
 				throw new RuntimeException("Failed to delete weather file");
 			}
 		}
+		this.timer = new Timer();
 	}
 }

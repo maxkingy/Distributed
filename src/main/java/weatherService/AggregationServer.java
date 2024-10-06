@@ -80,6 +80,7 @@ public class AggregationServer extends Thread {
 				clock.deleteFiles();
 			}
 			Database.getInstance().clearDatabase();
+			QueueHandler.getInstance().clearQueue();
 			System.out.println("The aggregation server has been shutdown.");
 		} catch (SocketException e) {
 			System.err.println("Error closing server socket: " + e.getMessage());
@@ -104,7 +105,7 @@ public class AggregationServer extends Thread {
 	 */
 	@Override
 	public void run() {
-		while (!isInterrupted()) {
+		while (!Thread.currentThread().isInterrupted()) {
 			try {
 				socket = serverSocket.accept();
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

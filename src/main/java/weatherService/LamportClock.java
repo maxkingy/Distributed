@@ -52,16 +52,12 @@ public class LamportClock {
 			if (!savedClock.delete()) {
 				System.err.println("Could not delete lamport file");
 			}
-		} else {
-			System.err.println("Error: cannot delete " + serverLamportFile);
 		}
 		File savedPID = new File(PIDFile);
 		if (savedPID.exists()) {
 			if (!savedPID.delete()) {
 				System.err.println("Could not delete PID file");
 			}
-		} else {
-			System.err.println("Error: cannot delete " + PIDFile);
 		}
 	}
 

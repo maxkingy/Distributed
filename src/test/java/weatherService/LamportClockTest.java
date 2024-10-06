@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +17,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class LamportClockTest {
+	
+	private final PrintStream originalOut = System.out;
+	private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 	private LamportClock clock;
 
 	@BeforeEach
 	void setUp() {
+		System.setOut(new PrintStream(outputStream));
 		new File("LAMPORT_CLOCK.txt").delete();
 		new File("PID_COUNTER.txt").delete();
 		clock = LamportClock.initialiseLamportClock();
@@ -27,6 +33,7 @@ class LamportClockTest {
 
 	@AfterEach
 	void tearDown() {
+		System.setOut(originalOut);
 		clock.deleteFiles();
 	}
 
