@@ -1,0 +1,88 @@
+PUT GET Test
+
+This test will simulate a PUT request followed by a GET request. The GET request should return the data which was PUT to 
+the aggregation server database. To run this test, first open a terminal in the project root directory and run mvn clean
+install. 
+
+Start the aggregation server in the terminal using the command:
+
+mvn exec:java -Dexec.mainClass=weatherService.AggregationServer
+
+The output to the terminal should be:
+Aggregation server starting up, listening at port 4567
+You can access http://localhost:4567 now.
+
+
+Next, open a second terminal in the root directory of the project and run the following command:
+
+mvn exec:java -Dexec.mainClass=weatherService.ContentServer -Dexec.args="http://localhost:4567 1 cs1.txt"
+
+This uses a content server to PUT the weather data in cs1.txt into the database under the station ID 1. The output to 
+the terminal should be:
+
+New PID allocated: 1
+Connected to localhost at port 4567
+HTTP/1.1 201 Created
+Content-Type: application/json
+Content-Length: 759
+Connection: close
+
+{"process_id":"1","data":[{"apparent_t":15,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":19,"cloud":"Sunny","local_date_time_full":"20230716170000","local_date_time":"16/05:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60901","state":" SA","press":1023.9,"lat":-34.9},{"apparent_t":9.5,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":13.3,"cloud":"Partly cloudy","local_date_time_full":"20230715160000","local_date_time":"15/04:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60902","state":" SA","press":1023.9,"lat":-34.9}],"station_id":"1","lamport_timestamp":"1","number_of_entries":2}
+
+
+Finally, open a third terminal in the root directory of the project and run the following command:
+
+mvn exec:java -Dexec.mainClass=weatherService.GETClient -Dexec.args="http://localhost:4567 1"
+
+The GETClient instance should retrieve the data under the station ID 1 from the database, and display it to the user.
+This is the second process, so the process id should be 2. Expected to receive a 200 OK response. Therefore, the 
+terminal output should be:
+
+New PID allocated: 2
+Connected to localhost on port 4567
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 759
+Connection: close
+
+{"process_id":"1","data":[{"apparent_t":15,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":19,"cloud":"Sunny","local_date_time_full":"20230716170000","local_date_time":"16/05:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60901","state":" SA","press":1023.9,"lat":-34.9},{"apparent_t":9.5,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":13.3,"cloud":"Partly cloudy","local_date_time_full":"20230715160000","local_date_time":"15/04:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60902","state":" SA","press":1023.9,"lat":-34.9}],"station_id":"1","lamport_timestamp":"1","number_of_entries":2}
+
+Station ID: 1
+
+Id: IDS60901
+Name: Adelaide (West Terrace /  ngayirdapira)
+State:  SA
+Timezone: CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time: 16/05:00pm
+Local Date Time Full: 20230716170000
+Air Temperature: 19.0
+Apparent Temperature: 15.0
+Cloud: Sunny
+Dew Point: 5.7
+Pressure: 1023.9
+Relative Humidity: 60.0
+Wind Direction: S
+Wind Speed Kmh: 15.0
+Wind Speed Kt: 8.0
+
+Id: IDS60902
+Name: Adelaide (West Terrace /  ngayirdapira)
+State:  SA
+Timezone: CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time: 15/04:00pm
+Local Date Time Full: 20230715160000
+Air Temperature: 13.3
+Apparent Temperature: 9.5
+Cloud: Partly cloudy
+Dew Point: 5.7
+Pressure: 1023.9
+Relative Humidity: 60.0
+Wind Direction: S
+Wind Speed Kmh: 15.0
+Wind Speed Kt: 8.0
+
+Navigate back to the initial terminal and press ctrl+C to stop the aggregation server.

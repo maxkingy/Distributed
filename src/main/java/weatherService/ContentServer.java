@@ -26,7 +26,7 @@ public class ContentServer extends Thread {
 	int PID = -1; // Initialise PID
 
 	/*
-	 * Helper method to start the server. The input arguments to this method are the
+	 * Method to start the server. The input arguments to this method are the
 	 * command-line inputs given to main and the main.weatherService.ContentServer
 	 * instance. The first command-line input is the server URI, the second is the
 	 * station ID, and the third is the input file containing weather data.
@@ -34,7 +34,7 @@ public class ContentServer extends Thread {
 	 * This method sets up the lamport clock, server host and port, station ID as
 	 * well as the data entries before starting the thread (which invokes run()).
 	 */
-	private void startServer(String[] args, ContentServer server) throws URISyntaxException {
+	public void startServer(String[] args, ContentServer server) throws URISyntaxException {
 		PID = LamportClock.getNewPID();
 		clock = new LamportClock(PID, 0);
 		uri = new URI(args[0]);
@@ -52,7 +52,7 @@ public class ContentServer extends Thread {
 	}
 
 	// Helper method to stop the server. Interrupts the thread.
-	private void stopServer() {
+	public void stopServer() {
 		this.interrupt();
 	}
 

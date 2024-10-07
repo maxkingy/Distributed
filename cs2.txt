@@ -15,7 +15,6 @@ rel_hum: 58
 wind_dir: NE
 wind_spd_kmh: 18
 wind_spd_kt: 10
-
 id:IDS60904
 name:Adelaide (West Terrace / ngayirdapira)
 state: SA
@@ -33,7 +32,6 @@ rel_hum: 65
 wind_dir: SW
 wind_spd_kmh: 20
 wind_spd_kt: 12
-
 id:IDS60905
 name:Adelaide (West Terrace / ngayirdapira)
 state: SA

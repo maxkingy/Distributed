@@ -53,7 +53,7 @@ class QueueHandlerTest {
 	 */
 	@Test
 	@DisplayName("Test clearing the queue and getting request from an empty queue")
-	public void testClearQueue() {
+	 void testClearQueue() {
 		ClientRequest request1 = new ClientRequest(null, "1", "100", null, null, null);
 		QueueHandler.getInstance().addRequestToQueue(request1);
 

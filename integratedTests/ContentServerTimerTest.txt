@@ -1,0 +1,179 @@
+Content server timer test
+
+This test ensures that the timers for a content server are working correctly. It will use a content server to PUT data 
+into the database, and then test if it can be retrieved after 30 seconds using a GET client. After, the same data will 
+be PUT into the database, then updated after 15 seconds, then after 20 seconds it will be retrieved using a GET 
+client. The timer should have restarted and the updated data will be retrieved. To run this test, first open a terminal 
+in the project root directory and run mvn clean install. 
+
+Start the aggregation server in the terminal using the command:
+
+mvn exec:java -Dexec.mainClass=weatherService.AggregationServer
+
+The output to the terminal should be:
+Aggregation server starting up, listening at port 4567
+You can access http://localhost:4567 now.
+
+
+Next, open a second terminal in the root directory of the project and run the following command:
+
+mvn exec:java -Dexec.mainClass=weatherService.ContentServer -Dexec.args="http://localhost:4567 1 cs1.txt"
+
+This uses a content server to PUT the weather data in cs1.txt into the database under the station ID 1. The output to 
+the terminal should be:
+
+New PID allocated: 1
+Connected to localhost at port 4567
+HTTP/1.1 201 Created
+Content-Type: application/json
+Content-Length: 759
+Connection: close
+
+{"process_id":"1","data":[{"apparent_t":15,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":19,"cloud":"Sunny","local_date_time_full":"20230716170000","local_date_time":"16/05:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60901","state":" SA","press":1023.9,"lat":-34.9},{"apparent_t":9.5,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":13.3,"cloud":"Partly cloudy","local_date_time_full":"20230715160000","local_date_time":"15/04:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60902","state":" SA","press":1023.9,"lat":-34.9}],"station_id":"1","lamport_timestamp":"1","number_of_entries":2}
+
+
+Next, open a third terminal and wait until 30 seconds after the PUT operation. Once 30 seconds has elapsed, run the 
+following command:
+
+mvn exec:java -Dexec.mainClass=weatherService.GETClient -Dexec.args="http://localhost:4567 1"
+
+This will use a GET client to attempt to retrieve the data. However the timer should have expired and the content server
+should have been deleted. Hence it should return a 404 Not Found status. The output should be:
+
+New PID allocated: 2
+Connected to localhost on port 4567
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 0
+Connection: close
+
+HTTP/1.1 404 Not Found
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>404 Not Found</title>
+</head>
+<body>
+<h1>404 Not Found</h1>
+<p>Data not found in database</p>
+</body>
+</html>
+
+Data for station ID 1 not found.
+
+
+Next go back to the second terminal and run the same command as before:
+
+mvn exec:java -Dexec.mainClass=weatherService.ContentServer -Dexec.args="http://localhost:4567 1 cs1.txt"
+
+This should PUT the weather data back onto the database. The PID should be 3, and the status code should be 201 Created, 
+even though it had been previously PUT to the database. This is because it should have been deleted. The output should 
+be:
+
+New PID allocated: 3
+Connected to localhost at port 4567
+HTTP/1.1 201 Created
+Content-Type: application/json
+Content-Length: 759
+Connection: close
+
+{"process_id":"3","data":[{"apparent_t":15,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":19,"cloud":"Sunny","local_date_time_full":"20230716170000","local_date_time":"16/05:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60901","state":" SA","press":1023.9,"lat":-34.9},{"apparent_t":9.5,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":13.3,"cloud":"Partly cloudy","local_date_time_full":"20230715160000","local_date_time":"15/04:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60902","state":" SA","press":1023.9,"lat":-34.9}],"station_id":"1","lamport_timestamp":"1","number_of_entries":2}
+
+
+Wait for 15 seconds to elapse, and run the same command again:
+
+mvn exec:java -Dexec.mainClass=weatherService.ContentServer -Dexec.args="http://localhost:4567 1 cs2.txt"
+
+This should update the weather data under station ID 1 in the database to that which is contained in cs2.txt and restart
+the content server's timer. The status should be 200 OK, as it is an update. The output should be:
+
+New PID allocated: 4
+Connected to localhost at port 4567
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 1105
+Connection: close
+
+{"process_id":"4","data":[{"apparent_t":20,"wind_spd_kmh":18,"rel_hum":58,"lon":138.6,"dewpt":6.1,"wind_spd_kt":10,"wind_dir":" NE","time_zone":" CST","air_temp":22,"cloud":" Clear","local_date_time_full":" 20230717180000","local_date_time":" 17/06:00pm","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60903","state":" SA","press":1021.7,"lat":-34.9},{"apparent_t":7,"wind_spd_kmh":20,"rel_hum":65,"lon":138.6,"dewpt":4.8,"wind_spd_kt":12,"wind_dir":" SW","time_zone":" CST","air_temp":10,"cloud":" Overcast","local_date_time_full":" 20230718070000","local_date_time":" 18/07:00am","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60904","state":" SA","press":1025.3,"lat":-34.9},{"apparent_t":14,"wind_spd_kmh":12,"rel_hum":55,"lon":138.6,"dewpt":6.3,"wind_spd_kt":6,"wind_dir":" SE","time_zone":" CST","air_temp":16.5,"cloud":" Mostly sunny","local_date_time_full":" 20230719090000","local_date_time":" 19/09:00am","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60905","state":" SA","press":1019.5,"lat":-34.9}],"station_id":"1","lamport_timestamp":"1","number_of_entries":3}
+
+
+Wait for 20 seconds to elapse. This means that 35 seconds have elapsed since the original PUT request after the 404 Not 
+Found GET request. Run the following command in the third terminal:
+
+mvn exec:java -Dexec.mainClass=weatherService.GETClient -Dexec.args="http://localhost:4567 1"
+
+If the timer had not been updated this would return another 404. If correct, the output should be:
+
+New PID allocated: 5
+Connected to localhost on port 4567
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 1105
+Connection: close
+
+{"process_id":"4","data":[{"apparent_t":20,"wind_spd_kmh":18,"rel_hum":58,"lon":138.6,"dewpt":6.1,"wind_spd_kt":10,"wind_dir":" NE","time_zone":" CST","air_temp":22,"cloud":" Clear","local_date_time_full":" 20230717180000","local_date_time":" 17/06:00pm","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60903","state":" SA","press":1021.7,"lat":-34.9},{"apparent_t":7,"wind_spd_kmh":20,"rel_hum":65,"lon":138.6,"dewpt":4.8,"wind_spd_kt":12,"wind_dir":" SW","time_zone":" CST","air_temp":10,"cloud":" Overcast","local_date_time_full":" 20230718070000","local_date_time":" 18/07:00am","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60904","state":" SA","press":1025.3,"lat":-34.9},{"apparent_t":14,"wind_spd_kmh":12,"rel_hum":55,"lon":138.6,"dewpt":6.3,"wind_spd_kt":6,"wind_dir":" SE","time_zone":" CST","air_temp":16.5,"cloud":" Mostly sunny","local_date_time_full":" 20230719090000","local_date_time":" 19/09:00am","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60905","state":" SA","press":1019.5,"lat":-34.9}],"station_id":"1","lamport_timestamp":"1","number_of_entries":3}
+
+Station ID: 1
+
+Id: IDS60903
+Name: Adelaide (West Terrace / ngayirdapira)
+State:  SA
+Timezone:  CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time:  17/06:00pm
+Local Date Time Full:  20230717180000
+Air Temperature: 22.0
+Apparent Temperature: 20.0
+Cloud:  Clear
+Dew Point: 6.1
+Pressure: 1021.7
+Relative Humidity: 58.0
+Wind Direction:  NE
+Wind Speed Kmh: 18.0
+Wind Speed Kt: 10.0
+
+Id: IDS60904
+Name: Adelaide (West Terrace / ngayirdapira)
+State:  SA
+Timezone:  CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time:  18/07:00am
+Local Date Time Full:  20230718070000
+Air Temperature: 10.0
+Apparent Temperature: 7.0
+Cloud:  Overcast
+Dew Point: 4.8
+Pressure: 1025.3
+Relative Humidity: 65.0
+Wind Direction:  SW
+Wind Speed Kmh: 20.0
+Wind Speed Kt: 12.0
+
+Id: IDS60905
+Name: Adelaide (West Terrace / ngayirdapira)
+State:  SA
+Timezone:  CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time:  19/09:00am
+Local Date Time Full:  20230719090000
+Air Temperature: 16.5
+Apparent Temperature: 14.0
+Cloud:  Mostly sunny
+Dew Point: 6.3
+Pressure: 1019.5
+Relative Humidity: 55.0
+Wind Direction:  SE
+Wind Speed Kmh: 12.0
+Wind Speed Kt: 6.0
+
+
+This test may fail if more than two minutes elapse since starting the aggregation server, as it is set to shutdown after
+two minutes. If required, this can be manually changed in the AggregationServer main method, by increasing the value of
+Thread.sleep().
+
+Navigate back to the initial terminal and press ctrl+C to stop the aggregation server.

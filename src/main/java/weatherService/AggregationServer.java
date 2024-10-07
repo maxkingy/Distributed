@@ -67,7 +67,8 @@ public class AggregationServer extends Thread {
 	}
 
 	/*
-	 * Method to stop the server. Interrupt the thread and close and set the server socket to null.
+	 * Method to stop the server. Interrupt the thread and close and set the server
+	 * socket to null.
 	 */
 	public void stopServer() {
 		try {

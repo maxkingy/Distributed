@@ -35,9 +35,8 @@ class AggregationServerTest {
 	}
 
 	@AfterEach
-	void tearDown() throws InterruptedException {
+	void tearDown() {
 		System.setOut(originalOut);
-		aggregationServer.join();
 	}
 
 	/*

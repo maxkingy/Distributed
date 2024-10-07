@@ -93,7 +93,6 @@ public class WeatherDataEntry {
 	public void setWind_spd_kt(Double wind_spd_kt) {
 		this.wind_spd_kt = wind_spd_kt;
 	}
-
 	public String getID() {
 		return id;
 	}

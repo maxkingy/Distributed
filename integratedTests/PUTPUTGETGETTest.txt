@@ -1,0 +1,181 @@
+PUT PUT GET GET Test
+
+This test will simulate a PUT request by two different content servers, and then a GET request for a specified content 
+server's ID. The GET client will request for the weather data which was PUT into the database first, to ensure that it 
+can retrieve data which is not the most recent data. After, another GET request will be run to get the data which was 
+PUT to the database second. To run this test, first open a terminal in the project root directory and run mvn clean 
+install. 
+
+Start the aggregation server in the terminal using the command:
+
+mvn exec:java -Dexec.mainClass=weatherService.AggregationServer
+
+The output to the terminal should be:
+Aggregation server starting up, listening at port 4567
+You can access http://localhost:4567 now.
+
+
+Next, open a second terminal in the root directory of the project and run the following command:
+
+mvn exec:java -Dexec.mainClass=weatherService.ContentServer -Dexec.args="http://localhost:4567 1 cs1.txt"
+
+This uses a content server to PUT the weather data in cs1.txt into the database under the station ID 1. The output to 
+the terminal should be:
+
+New PID allocated: 1
+Connected to localhost at port 4567
+HTTP/1.1 201 Created
+Content-Type: application/json
+Content-Length: 759
+Connection: close
+
+{"process_id":"1","data":[{"apparent_t":15,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":19,"cloud":"Sunny","local_date_time_full":"20230716170000","local_date_time":"16/05:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60901","state":" SA","press":1023.9,"lat":-34.9},{"apparent_t":9.5,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":13.3,"cloud":"Partly cloudy","local_date_time_full":"20230715160000","local_date_time":"15/04:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60902","state":" SA","press":1023.9,"lat":-34.9}],"station_id":"1","lamport_timestamp":"1","number_of_entries":2}
+
+
+Open a third terminal in the root directory of the project and run the following command:
+
+mvn exec:java -Dexec.mainClass=weatherService.ContentServer -Dexec.args="http://localhost:4567 2 cs2.txt"
+
+This uses a second content server to PUT the weather data in cs2.txt into the database under the station ID 2. As this 
+is the second process, the PID allocated should be 2. The output should be:
+
+New PID allocated: 2
+Connected to localhost at port 4567
+HTTP/1.1 201 Created
+Content-Type: application/json
+Content-Length: 1105
+Connection: close
+
+{"process_id":"4","data":[{"apparent_t":20,"wind_spd_kmh":18,"rel_hum":58,"lon":138.6,"dewpt":6.1,"wind_spd_kt":10,"wind_dir":" NE","time_zone":" CST","air_temp":22,"cloud":" Clear","local_date_time_full":" 20230717180000","local_date_time":" 17/06:00pm","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60903","state":" SA","press":1021.7,"lat":-34.9},{"apparent_t":7,"wind_spd_kmh":20,"rel_hum":65,"lon":138.6,"dewpt":4.8,"wind_spd_kt":12,"wind_dir":" SW","time_zone":" CST","air_temp":10,"cloud":" Overcast","local_date_time_full":" 20230718070000","local_date_time":" 18/07:00am","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60904","state":" SA","press":1025.3,"lat":-34.9},{"apparent_t":14,"wind_spd_kmh":12,"rel_hum":55,"lon":138.6,"dewpt":6.3,"wind_spd_kt":6,"wind_dir":" SE","time_zone":" CST","air_temp":16.5,"cloud":" Mostly sunny","local_date_time_full":" 20230719090000","local_date_time":" 19/09:00am","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60905","state":" SA","press":1019.5,"lat":-34.9}],"station_id":"2","lamport_timestamp":"1","number_of_entries":3}
+
+
+Finally, open a fourth terminal in the root directory of the project and run the following command:
+
+mvn exec:java -Dexec.mainClass=weatherService.GETClient -Dexec.args="http://localhost:4567 1"
+
+The GETClient instance should retrieve the data under the station ID 1 from the database, and display it to the user.
+This is the third process, so the process id should be 3. Expected to receive a 200 OK response. Therefore, the 
+terminal output should be:
+
+New PID allocated: 3
+Connected to localhost on port 4567
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 759
+Connection: close
+
+{"process_id":"1","data":[{"apparent_t":15,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":19,"cloud":"Sunny","local_date_time_full":"20230716170000","local_date_time":"16/05:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60901","state":" SA","press":1023.9,"lat":-34.9},{"apparent_t":9.5,"wind_spd_kmh":15,"rel_hum":60,"lon":138.6,"dewpt":5.7,"wind_spd_kt":8,"wind_dir":"S","time_zone":"CST","air_temp":13.3,"cloud":"Partly cloudy","local_date_time_full":"20230715160000","local_date_time":"15/04:00pm","name":"Adelaide (West Terrace /  ngayirdapira)","id":"IDS60902","state":" SA","press":1023.9,"lat":-34.9}],"station_id":"1","lamport_timestamp":"1","number_of_entries":2}
+
+Station ID: 1
+
+Id: IDS60901
+Name: Adelaide (West Terrace /  ngayirdapira)
+State:  SA
+Timezone: CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time: 16/05:00pm
+Local Date Time Full: 20230716170000
+Air Temperature: 19.0
+Apparent Temperature: 15.0
+Cloud: Sunny
+Dew Point: 5.7
+Pressure: 1023.9
+Relative Humidity: 60.0
+Wind Direction: S
+Wind Speed Kmh: 15.0
+Wind Speed Kt: 8.0
+
+Id: IDS60902
+Name: Adelaide (West Terrace /  ngayirdapira)
+State:  SA
+Timezone: CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time: 15/04:00pm
+Local Date Time Full: 20230715160000
+Air Temperature: 13.3
+Apparent Temperature: 9.5
+Cloud: Partly cloudy
+Dew Point: 5.7
+Pressure: 1023.9
+Relative Humidity: 60.0
+Wind Direction: S
+Wind Speed Kmh: 15.0
+Wind Speed Kt: 8.0
+
+
+In the same fourth terminal run the following command:
+
+mvn exec:java -Dexec.mainClass=weatherService.GETClient -Dexec.args="http://localhost:4567 2"
+
+This second GETClient instance should retrieve the data under the station ID 2 from the database, and display it to the 
+user. This is the fourth process, so the process id should be 4. Expected to receive a 200 OK response. Therefore, the 
+terminal output should be:
+
+New PID allocated: 4
+Connected to localhost on port 4567
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 1105
+Connection: close
+
+{"process_id":"2","data":[{"apparent_t":20,"wind_spd_kmh":18,"rel_hum":58,"lon":138.6,"dewpt":6.1,"wind_spd_kt":10,"wind_dir":" NE","time_zone":" CST","air_temp":22,"cloud":" Clear","local_date_time_full":" 20230717180000","local_date_time":" 17/06:00pm","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60903","state":" SA","press":1021.7,"lat":-34.9},{"apparent_t":7,"wind_spd_kmh":20,"rel_hum":65,"lon":138.6,"dewpt":4.8,"wind_spd_kt":12,"wind_dir":" SW","time_zone":" CST","air_temp":10,"cloud":" Overcast","local_date_time_full":" 20230718070000","local_date_time":" 18/07:00am","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60904","state":" SA","press":1025.3,"lat":-34.9},{"apparent_t":14,"wind_spd_kmh":12,"rel_hum":55,"lon":138.6,"dewpt":6.3,"wind_spd_kt":6,"wind_dir":" SE","time_zone":" CST","air_temp":16.5,"cloud":" Mostly sunny","local_date_time_full":" 20230719090000","local_date_time":" 19/09:00am","name":"Adelaide (West Terrace / ngayirdapira)","id":"IDS60905","state":" SA","press":1019.5,"lat":-34.9}],"station_id":"2","lamport_timestamp":"1","number_of_entries":3}
+
+Station ID: 2
+
+Id: IDS60903
+Name: Adelaide (West Terrace / ngayirdapira)
+State:  SA
+Timezone:  CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time:  17/06:00pm
+Local Date Time Full:  20230717180000
+Air Temperature: 22.0
+Apparent Temperature: 20.0
+Cloud:  Clear
+Dew Point: 6.1
+Pressure: 1021.7
+Relative Humidity: 58.0
+Wind Direction:  NE
+Wind Speed Kmh: 18.0
+Wind Speed Kt: 10.0
+
+Id: IDS60904
+Name: Adelaide (West Terrace / ngayirdapira)
+State:  SA
+Timezone:  CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time:  18/07:00am
+Local Date Time Full:  20230718070000
+Air Temperature: 10.0
+Apparent Temperature: 7.0
+Cloud:  Overcast
+Dew Point: 4.8
+Pressure: 1025.3
+Relative Humidity: 65.0
+Wind Direction:  SW
+Wind Speed Kmh: 20.0
+Wind Speed Kt: 12.0
+
+Id: IDS60905
+Name: Adelaide (West Terrace / ngayirdapira)
+State:  SA
+Timezone:  CST
+Latitude: -34.9
+Longitude: 138.6
+Local Date Time:  19/09:00am
+Local Date Time Full:  20230719090000
+Air Temperature: 16.5
+Apparent Temperature: 14.0
+Cloud:  Mostly sunny
+Dew Point: 6.3
+Pressure: 1019.5
+Relative Humidity: 55.0
+Wind Direction:  SE
+Wind Speed Kmh: 12.0
+Wind Speed Kt: 6.0
+
+Navigate back to the initial terminal and press ctrl+C to stop the aggregation server.
