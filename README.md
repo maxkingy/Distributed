@@ -1,5 +1,7 @@
 # Weather Service
 
+This project was built in the Eclipse IDE, using Maven and with JUnit testing.
+
 This project is designed to simulate a weather service, where an aggregation server holds weather data. Content servers 
 can connect to the aggregation server through a socket and PUT weather data into the database. GET clients can also 
 connect, and retrieve either specified data by content server ID or the most recent data PUT into the database. The 
@@ -72,6 +74,7 @@ integrated tests can be found in the integratedTests folder, where each file con
 test and the expected results. These tests are more general tests, which ensure that each server is properly running and
 the overall functionality of the project is correct.
 
-The purpose of the integrated tests is to check that the servers work properly together. Each integrated test has been 
-tested using JUnit with mocked responses, requests, sockets, etc., in the src.test.java.weatherService directory, in the 
-various testing classes.
+The purpose of the integrated tests is to check that the servers work properly together. The functionality of each 
+integrated test has been separately tested using JUnit with mocked responses, requests, sockets, etc., in the 
+src.test.java.weatherService directory, in the various testing classes. Each integrated test was run by following the 
+set instructions, and passed.
